@@ -1,0 +1,31 @@
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import wordnet
+
+# Download necessary NLTK resources
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('omw-1.4')  # Adding this line to download the required "omw-1.4" resource
+
+# Function to find the most common synonym for a word using WordNet
+def most_common_synonym(word):
+    synsets = wordnet.synsets(word)  # Get all synsets for the word
+    if synsets:
+        all_synonyms = [syn.lemmas() for syn in synsets]  # Get all lemmas for each synset
+        all_synonyms = [lemma.name().replace('_', ' ') for syn in all_synonyms for lemma in syn]  # Flatten the list of lemmas, replacing underscores with spaces
+        synonym_counts = {synonym: all_synonyms.count(synonym) for synonym in all_synonyms}  # Count occurrences of each synonym
+        most_common_synonym = max(synonym_counts, key=synonym_counts.get)  # Get the synonym with the highest count
+        return most_common_synonym
+    else:
+        return word  # If no synsets found, return the original word
+
+# Function to replace each word in a comment with its most common synonym
+def replace_with_synonyms(comment):
+    tokens = word_tokenize(comment)  # Tokenize the comment into words
+    replaced_tokens = [most_common_synonym(token.lower()) for token in tokens]  # Replace each word with its most common synonym
+    return ' '.join(replaced_tokens)  # Join the replaced tokens back into a comment
+
+# Example usage
+example_comment = "I am loving this"
+synonym_replaced_comment = replace_with_synonyms(example_comment)
+print(synonym_replaced_comment)
